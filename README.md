@@ -16,6 +16,7 @@ The different types of branches we may use are:
 * Feature, bugfix, and hotfix branches
 
 # Branches
+![jimFlow diagram](jimFlow.png)
 ## Master
 The Master branch will be named `master` and will contain the entire history.  All branches will merge back into master eventually.  Releases will be tagged commits.  CI pipelines will monitor `master` for tags with symver version in the format `v#.#.#` and build on these.
 
