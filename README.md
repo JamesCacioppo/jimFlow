@@ -1,17 +1,21 @@
-# The Jimflow Branching and Release Strategy
-## There can be only one... strategy that is
-The chosen branching strategy is Jimflow.  Details regarding this strategy can be found within Jim's head.  To get there you take a left then a right, then continue walking until you see a brick wall.  Proceed to bang your head into the wall three times while repeating "There's no place like Jim's head."  You will now be magically transported to Jim's head.  My condolences.
+# The jimFlow Branching Strategy
+## There can be only one...
+The chosen branching strategy is jimFlow.  It is a strategy which promotes simplicity and flexibility while striving to avoid "merge hell."  It's basically Github flow.
 
 # Why are we using this workflow?
-Traditional Gitflow has a few pitfalls which can largely be avoided by simplifying the branching strategy.
+The Trunk branching strategy forces all developers to work in the trunk which is great in ideal conditions but can cause issues in non-ideal environments.  Gitflow, while solving many issues also adds much complexity and introduces an experience commonly known as "merge hell."
+
+Github flow is a simple, flexible, and highly effective branching strategy.  What follows is our specification of that strategy.
 
 Some goals of this strategy are:
 * Prevent difficult merge conflicts which come from attempting to shoehorn hotfixes and release branches into both Master and Develop branches simultaneously.
 * Avoid complexity and clutter by reducing the number of long running branches.
-* TODO: Figure out how to word issues about deployments
+* Reduce branch lifetime by reducing time to merge.
+
+Caveats:
+* Going back and applying a fix to an older release version might require creating a branch that is hard or impossible to merge back into `master`.  See [Applying fixes to old releases](#applying-fixes-to-old-releases).
 
 The different types of branches we may use are:
-
 * Master
 * Feature, bugfix, and hotfix branches
 
@@ -31,3 +35,38 @@ The Master branch will be named `master` and will contain the entire history.  A
 * Bugfix and Hotfix branches should follow the same proceedures.
 * Bugfixes may branch from both `master` and feature branches.
 * Hotfixes will branch from `master`.
+
+# Examples
+## Feature branches
+* Creating a feature branch
+```
+git checkout master
+git checkout -b STORY3-add-node-feature
+git push origin STORY3-add-node-feature
+```
+
+* Merging the source branch into the feature branch before a PR
+```
+git checkout STORY3-add-node-feature
+git merge master
+```
+## The `master` branch
+* Tagging releases
+```
+git checkout master
+git tag -a v1.0.1 -m "some meaningful message"
+git push origin v1.0.1
+```
+
+## Applying fixes to old releases
+It's best to avoid going back and fixing old releases but if you must then it might be a good idea to follow the trunk workflow in which you would create a branch from the release and commit to that branch.
+```
+git checkout v0.1.0
+git checkout -b HOTFIX2-some-fix-ticket-name
+```
+When the fix is pushed tag the commit as shown in [The master branch](#the-master-branch) (obviously, skip the checkout master part).  Once the fix has been deployed and you're comfortable that everything works, go ahead and delete the branch.
+```
+git push --delete origin HOTFIX2-some-fix-ticket-name
+git fetch && git remote prune origin
+```
+If there's ever a need to re-open that branch and make further changes just find the SHA1 for the last commit on the deleted branch with `git reflog --no-abbrev` and then check it out with `git checkout -b <branch> <sha>`.
